@@ -1,0 +1,8 @@
+:root{--hero-grad-start:#5b8def;--hero-grad-end:#8b5bff}
+body{background:linear-gradient(180deg,#f8f9fb 0,#f8f9fb 60%,#ffffff 100%)}
+.hero-gradient{background:linear-gradient(135deg,var(--hero-grad-start),var(--hero-grad-end));border-bottom-left-radius:20px;border-bottom-right-radius:20px}
+.health-dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle}
+.card .card-title{letter-spacing:.2px}
+.table>thead th{font-weight:600}
+.btn-primary{box-shadow:0 .25rem .5rem rgba(43,108,176,.25)}
+pre{white-space:pre-wrap}

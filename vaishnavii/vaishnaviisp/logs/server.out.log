@@ -1,0 +1,12 @@
+Web server started on http://localhost:8081
+Customer created: Customer{id='f3478367-5a05-4f6f-9ed7-afae291711dd', name='Vaishnavi Muthuvel', email='muthuvel04041971@gmail.com', plan='Basic'}
+Customer created: Customer{id='cf393324-c647-49c0-bca0-ea3a8ac437f7', name='Monika M', email='monikam@example.com', plan='Basic'}
+Usage recorded: NetworkUsage{id='c216e63c-cfe2-4f02-bfc2-439c5b382067', customerId='cf393324-c647-49c0-bca0-ea3a8ac437f7', gb=10.0, timestamp=2025-11-17T20:18:43.635566300}
+Ticket created: Ticket{id='4909327e-e4de-4b01-9e04-5595cb9c1ca6', customerId='cf393324-c647-49c0-bca0-ea3a8ac437f7', status=OPEN, description='connectivity issues'}
+Device connected: Device{id='bbedcdb0-19d2-4553-9c75-bd9761dd6c94', name='vaish ', MAC='AA:BB', status=ACTIVE, data=0.00 GB, duration=0 min}
+
+=== Running Billing Cycle ===
+Bill for Monika M (cf393324-c647-49c0-bca0-ea3a8ac437f7): $25.00
+Bill for Vaishnavi Muthuvel (f3478367-5a05-4f6f-9ed7-afae291711dd): $20.00
+=== Billing Cycle Complete ===
+

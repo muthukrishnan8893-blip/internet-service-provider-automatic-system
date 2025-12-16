@@ -1,0 +1,41 @@
+{
+  "connected_devices_dashboard": {
+    "customer_id": "customer-uuid-here",
+    "total_devices": 3,
+    "devices": [
+      {
+        "device_id": "device-001",
+        "device_name": "iQOO Z7",
+        "customer_id": "customer-uuid-here",
+        "connection_start_time": "2025-12-12 10:15:23",
+        "connection_end_time": "Still Active",
+        "total_data_used_mb": 1250.50,
+        "average_speed_mbps": 45.20,
+        "ip_address": "192.168.1.101",
+        "status": "Active"
+      },
+      {
+        "device_id": "device-002",
+        "device_name": "OPPO A57",
+        "customer_id": "customer-uuid-here",
+        "connection_start_time": "2025-12-12 08:20:45",
+        "connection_end_time": "2025-12-12 08:55:30",
+        "total_data_used_mb": 89.30,
+        "average_speed_mbps": 38.70,
+        "ip_address": "192.168.1.102",
+        "status": "Disconnected"
+      },
+      {
+        "device_id": "device-003",
+        "device_name": "Samsung M14",
+        "customer_id": "customer-uuid-here",
+        "connection_start_time": "2025-12-12 06:10:15",
+        "connection_end_time": "Still Active",
+        "total_data_used_mb": 2450.80,
+        "average_speed_mbps": 52.30,
+        "ip_address": "192.168.1.103",
+        "status": "Active"
+      }
+    ]
+  }
+}

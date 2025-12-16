@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISP Management System - Complete Automation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Authentication Screen -->
+<div id="authScreen" class="auth-container">
+    <div class="auth-card">
+        <h2 class="auth-title">
+            <i class="fas fa-globe me-2"></i> ISP Management
+        </h2>
+
+        <ul class="nav nav-tabs mb-4">
+            <li class="nav-item">
+                <button class="nav-link active" id="loginTab" onclick="switchTab('login')">
+                    <i class="fas fa-sign-in-alt me-2"></i> Login
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="registerTab" onclick="switchTab('register')">
+                    <i class="fas fa-user-plus me-2"></i> Register
+                </button>
+            </li>
+        </ul>
+
+        <!-- Login Form -->
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="mb-3">
+                <label class="form-label">Email or Username</label>
+                <input type="text" class="form-control" id="loginUsername" placeholder="Enter email or username" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" id="loginPassword" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Login As</label>
+                <select class="form-control" id="loginRole" required>
+                    <option value="CUSTOMER">Customer</option>
+                    <option value="ADMIN">Admin</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-sign-in-alt me-2"></i> Login
+            </button>
+            <div class="text-center mt-3">
+                <a href="#" class="text-primary" onclick="showForgotPassword(event)">
+                    <i class="fas fa-key me-1"></i> Forgot Password?
+                </a>
+            </div>
+            <hr>
+            <p class="text-muted text-center small">
+                <strong>Demo Credentials:</strong><br>
+                Customer: vaishnavimuthuvel223@gmail.com / customer123<br>
+                Admin: muthuvel04041971@gmail.com / admin123
+            </p>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" onsubmit="handleRegister(event)" style="display: none;">
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-control" id="regUsername" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="regEmail" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" id="regPassword" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Account Type</label>
+                <select class="form-control" id="regRole" required>
+                    <option value="CUSTOMER">Customer</option>
+                    <option value="ADMIN">Admin</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-user-plus me-2"></i> Register
+            </button>
+        </form>
+
+        <!-- Forgot Password Form -->
+        <div id="forgotPasswordForm" style="display: none;">
+            <div class="text-center mb-3">
+                <button class="btn btn-link" onclick="backToLogin()">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Login
+                </button>
+            </div>
+            
+            <!-- Step 1: Request OTP -->
+            <div id="otpRequestStep">
+                <h5 class="text-center mb-4">Reset Password</h5>
+                <form onsubmit="requestOTP(event)">
+                    <div class="mb-3">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="forgotEmail" placeholder="Enter your registered email" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-paper-plane me-2"></i> Send OTP
+                    </button>
+                </form>
+            </div>
+
+            <!-- Step 2: Verify OTP and Reset Password -->
+            <div id="otpVerifyStep" style="display: none;">
+                <h5 class="text-center mb-4">Enter OTP</h5>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> OTP has been sent to your email
+                </div>
+                <form onsubmit="verifyOTPAndResetPassword(event)">
+                    <div class="mb-3">
+                        <label class="form-label">OTP Code</label>
+                        <input type="text" class="form-control" id="otpCode" placeholder="Enter 6-digit OTP" maxlength="6" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" placeholder="Enter new password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-check me-2"></i> Reset Password
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard Screen -->
+<div id="dashboardScreen" style="display: none;">
+    <nav class="navbar sticky-top navbar-light bg-white shadow-sm">
+        <div class="container-fluid">
+            <span class="navbar-brand">
+                <i class="fas fa-globe me-2"></i> ISP Management Dashboard
+            </span>
+            <div class="d-flex align-items-center gap-3">
+                <span id="userDisplay" class="badge bg-primary"></span>
+                <button class="btn btn-outline-danger btn-sm" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-md-2 py-4">
+                    <div class="sidebar">
+                        <h6 class="text-uppercase text-muted mb-3">Menu</h6>
+                        
+                        <!-- Customer Menu -->
+                        <div id="customerMenu">
+                            <a href="#" class="nav-link active" onclick="showSection('dashboard')">
+                                <i class="fas fa-chart-line"></i> Dashboard
+                            </a>
+                            <a href="#" class="nav-link" onclick="showSection('devices')">
+                                <i class="fas fa-mobile-alt"></i> Devices
+                            </a>
+                            <a href="#" class="nav-link" onclick="showSection('plans')">
+                                <i class="fas fa-list"></i> Plans
+                            </a>
+                            <a href="#" class="nav-link" onclick="showSection('tickets')">
+                                <i class="fas fa-ticket-alt"></i> Tickets
+                            </a>
+                            <a href="#" class="nav-link" onclick="showSection('invoice')">
+                                <i class="fas fa-file-pdf"></i> Invoice
+                            </a>
+                        </div>
+
+                        <!-- Admin Menu -->
+                        <div id="adminMenu" style="display: none;">
+                            <a href="#" class="nav-link active" onclick="showSection('admin-dashboard')">
+                                <i class="fas fa-chart-bar"></i> Dashboard
+                            </a>
+                            <a href="#" class="nav-link" onclick="showSection('customers')">
+                                <i class="fas fa-users"></i> Customers
+                            </a>
+                            <a href="#" class="nav-link" onclick="showSection('revenue-management')">
+                                <i class="fas fa-dollar-sign"></i> Revenue
+                            </a>
+                            <a href="#" class="nav-link" onclick="showSection('admin-tickets')">
+                                <i class="fas fa-headset"></i> Tickets
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="col-md-10 py-4">
+                    <!-- Customer Dashboard -->
+                    <div id="dashboard" class="content-section">
+                        <!-- Usage Alerts Container -->
+                        <div id="usageAlertsContainer" class="mb-3"></div>
+                        
+                        <!-- Stats Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="currentPlan">-</div>
+                                    <div class="stat-label">Current Plan</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="dataUsage">0 GB</div>
+                                    <div class="stat-label">Data Used</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="usagePercentage">0%</div>
+                                    <div class="stat-label">Usage Percentage</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="remainingData">0 GB</div>
+                                    <div class="stat-label">Remaining Data</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="accountBalance">$0</div>
+                                    <div class="stat-label">Balance</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="devicesCount">0</div>
+                                    <div class="stat-label">Connected Devices</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Usage Chart -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i> Usage Trends</h5>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-light period-btn active" data-period="daily">Daily</button>
+                                    <button class="btn btn-light period-btn" data-period="weekly">Weekly</button>
+                                    <button class="btn btn-light period-btn" data-period="monthly">Monthly</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="usageChart" height="250"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <!-- Speed Test Card -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-success text-white">
+                                        <h5 class="mb-0"><i class="fas fa-tachometer-alt me-2"></i> Speed Test</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="text-muted">Test your current connection speed</p>
+                                        <button id="runSpeedTestBtn" class="btn btn-success mb-3">
+                                            <i class="fas fa-tachometer-alt me-2"></i>Run Speed Test
+                                        </button>
+                                        <div id="speedTestResults"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Device Breakdown Card -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-info text-white">
+                                        <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i> Device Usage Breakdown</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="deviceUsageChart" height="250"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Devices Section -->
+                    <div id="devices" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-mobile-alt me-2"></i> Connected Devices Dashboard</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">View all devices connected to your hotspot with real-time usage statistics.</p>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th><i class="fas fa-mobile-alt me-1"></i> Device Name</th>
+                                                <th><i class="fas fa-network-wired me-1"></i> IP Address</th>
+                                                <th><i class="fas fa-database me-1"></i> Data Used</th>
+                                                <th><i class="fas fa-tachometer-alt me-1"></i> Avg Speed</th>
+                                                <th><i class="fas fa-clock me-1"></i> Connected At</th>
+                                                <th><i class="fas fa-sign-out-alt me-1"></i> Disconnected At</th>
+                                                <th><i class="fas fa-info-circle me-1"></i> Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="devicesList">
+                                            <!-- Devices will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Plans Section -->
+                    <div id="plans" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-list me-2"></i> Available Plans</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row" id="plansList"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tickets Section -->
+                    <div id="tickets" class="content-section" style="display: none;">
+                        <div class="card mb-4">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="fas fa-plus me-2"></i> Create New Support Ticket</h5>
+                            </div>
+                            <div class="card-body">
+                                <form onsubmit="createTicket(event)">
+                                    <div class="mb-3">
+                                        <label class="form-label">Subject</label>
+                                        <input type="text" class="form-control" id="ticketSubject" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Description</label>
+                                        <textarea class="form-control" id="ticketDescription" rows="4" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-paper-plane me-2"></i> Submit Ticket
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-list me-2"></i> Your Tickets</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="ticketsList"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Invoice Section -->
+                    <div id="invoice" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-file-pdf me-2"></i> Download Invoice</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <p class="text-muted mb-4">Download your current monthly invoice as PDF</p>
+                                <button class="btn btn-danger btn-lg" onclick="downloadInvoice()">
+                                    <i class="fas fa-download me-2"></i> Download Invoice PDF
+                                </button>
+                                <p class="text-success mt-3"><i class="fas fa-check-circle"></i> PDF invoice generation working!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Dashboard -->
+                    <div id="admin-dashboard" class="content-section" style="display: none;">
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="totalCustomers">0</div>
+                                    <div class="stat-label">Total Customers</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="activeTickets">0</div>
+                                    <div class="stat-label">Open Tickets</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="monthlyRevenue">$0</div>
+                                    <div class="stat-label">Monthly Revenue</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="systemStatus">Online</div>
+                                    <div class="stat-label">System Status</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue Management -->
+                    <div id="revenue-management" class="content-section" style="display: none;">
+                        <h4 class="mb-4"><i class="fas fa-dollar-sign me-2"></i>Revenue Management</h4>
+                        
+                        <!-- Revenue Overview Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="stat-card bg-success text-white">
+                                    <div class="stat-value" id="totalRevenue">$0</div>
+                                    <div class="stat-label">Total Revenue</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card bg-info text-white">
+                                    <div class="stat-value" id="thisMonthRevenue">$0</div>
+                                    <div class="stat-label">This Month</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card bg-warning text-white">
+                                    <div class="stat-value" id="pendingPayments">$0</div>
+                                    <div class="stat-label">Outstanding</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card bg-primary text-white">
+                                    <div class="stat-value" id="totalInvoices">0</div>
+                                    <div class="stat-label">Total Invoices</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Monthly/Yearly Comparison -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Revenue Comparison</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Monthly Revenue (Last 6 Months)</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-hover">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Month</th>
+                                                        <th>Revenue</th>
+                                                        <th>Change</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="monthlyRevenueTable"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Yearly Revenue Comparison</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-hover">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Year</th>
+                                                        <th>Revenue</th>
+                                                        <th>Growth</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="yearlyRevenueTable"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Revenue by Plan Type -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Revenue by Plan Type</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Plan Name</th>
+                                                <th>Subscribers</th>
+                                                <th>Monthly Price</th>
+                                                <th>Total Revenue</th>
+                                                <th>Percentage</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="planRevenueTable"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Outstanding Payments -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-warning text-white">
+                                <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Outstanding Payments</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Customer</th>
+                                                <th>Plan</th>
+                                                <th>Amount Due</th>
+                                                <th>Due Date</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="outstandingPaymentsTable"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Invoice Generation Summary -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0"><i class="fas fa-file-invoice me-2"></i>Invoice Generation Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <button class="btn btn-success" onclick="generateAllInvoices()">
+                                            <i class="fas fa-plus me-2"></i>Generate Monthly Invoices
+                                        </button>
+                                        <button class="btn btn-primary ms-2" onclick="exportRevenueReport()">
+                                            <i class="fas fa-download me-2"></i>Export Report
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Period</th>
+                                                <th>Total Invoices</th>
+                                                <th>Total Amount</th>
+                                                <th>Paid</th>
+                                                <th>Pending</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="invoiceSummaryTable"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment History -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Payment History</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Customer</th>
+                                                <th>Invoice ID</th>
+                                                <th>Amount</th>
+                                                <th>Method</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="paymentHistoryTable"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customers Management -->
+                    <div id="customers" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-users me-2"></i> Customer Management</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-striped">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Username</th>
+                                                <th>Email</th>
+                                                <th>Plan</th>
+                                                <th>Data Usage</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="customersTableBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Tickets -->
+                    <div id="admin-tickets" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-headset me-2"></i> Support Tickets Management</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="adminTicketsList"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Customer Detail Modal -->
+<div class="modal fade" id="customerDetailModal" tabindex="-1" aria-labelledby="customerDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="customerDetailModalLabel">
+          <i class="fas fa-user-circle me-2"></i>Customer Details
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="customerDetailContent">
+        <!-- Content will be loaded here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ticket Conversation Modal -->
+<div class="modal fade" id="ticketConversationModal" tabindex="-1" aria-labelledby="ticketConversationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="ticketConversationModalLabel">
+          <i class="fas fa-ticket-alt me-2"></i>Ticket Conversation
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="ticketConversationContent">
+          <div class="mb-3">
+            <h6 id="ticketModalSubject"></h6>
+            <p id="ticketModalDescription" class="text-muted"></p>
+            <span id="ticketModalStatus" class="badge"></span>
+          </div>
+          <hr>
+          <h6>Conversation</h6>
+          <div id="ticketMessages" style="max-height: 400px; overflow-y: auto;">
+            <!-- Messages will be loaded here -->
+          </div>
+          <hr>
+          <form id="ticketReplyForm" onsubmit="sendTicketReply(event)">
+            <div class="mb-3">
+              <label class="form-label">Your Reply</label>
+              <textarea class="form-control" id="ticketReplyMessage" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-paper-plane me-2"></i>Send Reply
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notification Preferences Modal -->
+<div class="modal fade" id="notificationPreferencesModal" tabindex="-1" aria-labelledby="notificationPreferencesModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="notificationPreferencesModalLabel">
+          <i class="fas fa-cog me-2"></i>Notification Preferences
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="notificationPreferencesForm" onsubmit="saveNotificationPreferences(event)">
+          <!-- Email Notifications -->
+          <div class="card mb-3">
+            <div class="card-header bg-light">
+              <h6 class="mb-0"><i class="fas fa-envelope me-2"></i>Email Notifications</h6>
+            </div>
+            <div class="card-body">
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" id="emailEnabled" checked>
+                <label class="form-check-label" for="emailEnabled">Enable email notifications</label>
+              </div>
+              <div class="ms-4">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="emailUsageAlerts" checked>
+                  <label class="form-check-label" for="emailUsageAlerts">Usage alerts</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="emailPaymentReminders" checked>
+                  <label class="form-check-label" for="emailPaymentReminders">Payment reminders</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="emailTicketUpdates" checked>
+                  <label class="form-check-label" for="emailTicketUpdates">Ticket updates</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="emailSecurityAlerts" checked>
+                  <label class="form-check-label" for="emailSecurityAlerts">Security alerts</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="emailPromotions">
+                  <label class="form-check-label" for="emailPromotions">Promotional emails</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Browser Notifications -->
+          <div class="card mb-3">
+            <div class="card-header bg-light">
+              <h6 class="mb-0"><i class="fas fa-browser me-2"></i>Browser Push Notifications</h6>
+            </div>
+            <div class="card-body">
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" id="browserEnabled" checked>
+                <label class="form-check-label" for="browserEnabled">Enable browser notifications</label>
+              </div>
+              <div class="ms-4">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="browserUsageAlerts" checked>
+                  <label class="form-check-label" for="browserUsageAlerts">Usage alerts</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="browserPaymentReminders" checked>
+                  <label class="form-check-label" for="browserPaymentReminders">Payment reminders</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="browserTicketUpdates" checked>
+                  <label class="form-check-label" for="browserTicketUpdates">Ticket updates</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="browserSecurityAlerts" checked>
+                  <label class="form-check-label" for="browserSecurityAlerts">Security alerts</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SMS Notifications -->
+          <div class="card mb-3">
+            <div class="card-header bg-light">
+              <h6 class="mb-0"><i class="fas fa-sms me-2"></i>SMS Notifications</h6>
+            </div>
+            <div class="card-body">
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" id="smsEnabled">
+                <label class="form-check-label" for="smsEnabled">Enable SMS notifications</label>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" id="phoneNumber" placeholder="+1234567890">
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="smsCriticalOnly" checked>
+                <label class="form-check-label" for="smsCriticalOnly">Critical alerts only</label>
+              </div>
+              <div class="ms-4">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="smsUsageAlerts">
+                  <label class="form-check-label" for="smsUsageAlerts">Usage alerts</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="smsPaymentReminders">
+                  <label class="form-check-label" for="smsPaymentReminders">Payment reminders</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="smsSecurityAlerts" checked>
+                  <label class="form-check-label" for="smsSecurityAlerts">Security alerts</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Usage Alert Thresholds -->
+          <div class="card mb-3">
+            <div class="card-header bg-light">
+              <h6 class="mb-0"><i class="fas fa-percentage me-2"></i>Usage Alert Thresholds</h6>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label class="form-label">First Alert at: <span id="threshold1Value">50</span>%</label>
+                <input type="range" class="form-range" min="10" max="90" value="50" id="usageAlertThreshold1" oninput="document.getElementById('threshold1Value').textContent = this.value">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Second Alert at: <span id="threshold2Value">75</span>%</label>
+                <input type="range" class="form-range" min="10" max="95" value="75" id="usageAlertThreshold2" oninput="document.getElementById('threshold2Value').textContent = this.value">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Final Alert at: <span id="threshold3Value">90</span>%</label>
+                <input type="range" class="form-range" min="10" max="100" value="90" id="usageAlertThreshold3" oninput="document.getElementById('threshold3Value').textContent = this.value">
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <button type="button" class="btn btn-outline-primary" onclick="sendTestNotification()">
+              <i class="fas fa-paper-plane me-2"></i>Send Test Notification
+            </button>
+            <div>
+              <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>Save Preferences
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="app.js?v=20251212183700"></script>
+
+</body>
+</html>

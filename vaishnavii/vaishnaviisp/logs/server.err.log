@@ -1,0 +1,6 @@
+Nov 17, 2025 8:17:37 PM org.apache.pdfbox.pdmodel.font.FileSystemFontProvider loadDiskCache
+WARNING: 334 new fonts found, font cache will be re-built
+Nov 17, 2025 8:17:37 PM org.apache.pdfbox.pdmodel.font.FileSystemFontProvider <init>
+WARNING: Building on-disk font cache, this may take a while
+Nov 17, 2025 8:17:51 PM org.apache.pdfbox.pdmodel.font.FileSystemFontProvider <init>
+WARNING: Finished building on-disk font cache, found 357 fonts

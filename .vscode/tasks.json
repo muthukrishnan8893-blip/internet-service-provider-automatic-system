@@ -1,0 +1,35 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start ISP Server",
+            "type": "shell",
+            "command": "mvn clean compile exec:java -Dexec.mainClass=com.isp.Main",
+            "options": {
+                "cwd": "${workspaceFolder}/vaishnavii/vaishnaviisp"
+            },
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*)$",
+                    "file": 1,
+                    "location": 2,
+                    "message": 3
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^.*Compiling.*$",
+                    "endsPattern": "^.*Web server started on.*$"
+                }
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "focus": false
+            },
+            "runOptions": {
+                "runOn": "folderOpen"
+            }
+        }
+    ]
+}
